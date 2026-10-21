@@ -1,0 +1,101 @@
+{
+  "entities": {
+    "Project": {
+      "title": "Project",
+      "description": "Construction project record for SHRI BUILDERS",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Project title",
+          "maxLength": 150
+        },
+        "description": {
+          "type": "string",
+          "description": "Project description and specifications",
+          "maxLength": 2000
+        },
+        "location": {
+          "type": "string",
+          "description": "Location in Coimbatore or Tamil Nadu",
+          "maxLength": 120
+        },
+        "category": {
+          "type": "string",
+          "description": "Project category",
+          "enum": ["Residential", "Commercial", "Industrial"]
+        },
+        "status": {
+          "type": "string",
+          "description": "Project progress status",
+          "enum": ["Ongoing", "Completed"]
+        },
+        "builtUpArea": {
+          "type": "string",
+          "description": "Built up area in sq.ft",
+          "maxLength": 50
+        },
+        "coverImage": {
+          "type": "string",
+          "description": "URL of the primary cover photo"
+        },
+        "images": {
+          "type": "array",
+          "description": "List of project photos with storage paths"
+        },
+        "isPublished": {
+          "type": "boolean",
+          "description": "Whether the project is visible on the public website"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last updated timestamp"
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "UID of the creating administrator"
+        }
+      },
+      "required": ["title", "category", "status", "location", "isPublished"]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "Authorized administrator record for role validation",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "Administrator email address"
+        },
+        "role": {
+          "type": "string",
+          "description": "Administrative role",
+          "enum": ["admin", "superadmin"]
+        },
+        "addedAt": {
+          "type": "string",
+          "description": "Timestamp when admin role was granted"
+        }
+      },
+      "required": ["email", "role"]
+    }
+  },
+  "firestore": {
+    "/projects/{projectId}": {
+      "schema": {
+        "$ref": "Project"
+      },
+      "description": "Stores construction projects and gallery metadata"
+    },
+    "/admins/{adminUid}": {
+      "schema": {
+        "$ref": "Admin"
+      },
+      "description": "Stores authorized admin user IDs for database role verification"
+    }
+  }
+}

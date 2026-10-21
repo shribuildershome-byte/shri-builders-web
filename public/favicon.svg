@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="14" fill="#1e40af" />
+  <!-- Construction / Building Blueprint Monogram -->
+  <path d="M 16 48 L 16 26 L 32 14 L 48 26 L 48 48 Z" fill="#2563eb" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round" />
+  <path d="M 24 48 L 24 34 L 40 34 L 40 48" fill="#1e3a8a" stroke="#ffffff" stroke-width="2" />
+  <circle cx="32" cy="24" r="3.5" fill="#facc15" />
+</svg>

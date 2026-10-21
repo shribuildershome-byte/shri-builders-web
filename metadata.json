@@ -1,0 +1,8 @@
+{
+  "name": "SHRI BUILDERS - Construction Company Coimbatore",
+  "description": "SHRI BUILDERS is a premier construction company in Coimbatore, Tamil Nadu, providing residential, commercial, industrial, house construction, building planning, plan approvals, and loan assistance.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,0 +1,62 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Default-deny catch-all for Zero-Trust security
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 2. Global Security Helper Primitives
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Check if the signed-in user is an explicitly authorized administrator
+    function isAdmin() {
+      return isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // 3. Project schema validation helper
+    function isValidProject(data) {
+      return data.title is string && data.title.size() > 0 && data.title.size() <= 150
+        && data.location is string && data.location.size() <= 120
+        && data.category is string && (data.category in ['Residential', 'Commercial', 'Industrial', 'Residential Buildings', 'Commercial Buildings', 'Industrial Buildings'])
+        && data.status is string && (data.status in ['Ongoing', 'Completed', 'Ongoing Projects', 'Completed Projects'])
+        && data.isPublished is bool;
+    }
+
+    // 4. Projects Collection
+    match /projects/{projectId} {
+      // Public visitors can read ONLY published projects.
+      // Authorized admins can read all projects (both drafts and published).
+      allow get: if (resource.data.isPublished == true) || isAdmin();
+      allow list: if (resource.data.isPublished == true) || isAdmin();
+
+      // Only authorized admins can write, publish, update or delete projects
+      allow create: if isAdmin() && isValidId(projectId) && isValidProject(incoming());
+      allow update: if isAdmin() && isValidId(projectId) && isValidProject(incoming());
+      allow delete: if isAdmin() && isValidId(projectId);
+    }
+
+    // 5. Admins Collection
+    match /admins/{adminUid} {
+      // Authenticated users can check only their own admin status document
+      allow get: if isSignedIn() && request.auth.uid == adminUid;
+      allow list: if isAdmin();
+      // Block arbitrary client writes to prevent privilege escalation
+      allow write: if false;
+    }
+  }
+}

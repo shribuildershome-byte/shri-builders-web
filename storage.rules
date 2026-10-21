@@ -1,0 +1,40 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper function to check authentication and admin status
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Check if the user is explicitly authorized as an administrator via Firestore
+    function isAdmin() {
+      return isSignedIn() && firestore.exists(/databases/(default)/documents/admins/$(request.auth.uid));
+    }
+
+    // Validate image format and file size limits (5 MB maximum)
+    function isValidImage() {
+      return request.resource.contentType.matches('image/(jpeg|jpg|png|webp)')
+        && request.resource.size <= 5 * 1024 * 1024;
+    }
+
+    // Match all project image assets
+    match /projects/{projectId}/{allPaths=**} {
+      // Anyone can read project photographs publicly
+      allow read: if true;
+
+      // Only authorized admins can upload new project photos
+      allow create: if isAdmin() && isValidImage();
+
+      // Only authorized admins can update or replace photos
+      allow update: if isAdmin() && isValidImage();
+
+      // Only authorized admins can delete project photos
+      allow delete: if isAdmin();
+    }
+
+    // Deny all other unmapped paths by default
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
